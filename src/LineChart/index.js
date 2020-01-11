@@ -1,27 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import * as d3 from 'd3';
-import { Container } from 'semantic-ui-react';
-import { API_BITCOIN } from './constants';
-import './App.css';
+import { Header } from 'semantic-ui-react';
+import { API_BITCOIN, LINE_CHART_TITLE } from './constants';
 
-// Based off of https://www.freecodecamp.org/news/learn-to-create-a-line-chart-using-d3-js-4f43f1ee716b/
-function App() {
-  const svgWidth = 1024;
-  const svgHeight = 600;
-  const margin = {
-    top: 20,
-    right: 100,
-    bottom: 20,
-    left: 100,
-  };
-  const width = svgWidth - margin.left - margin.right;
-  const height = svgHeight - margin.top - margin.bottom;
-  const svg = d3.select('.svg-container')
-    .append('svg')
-    .attr('width', svgWidth)
-    .attr('height', svgHeight);
-  const group = svg.append('g')
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+function LineChart(props) {
+  const { svgWidth, svgHeight, margin } = props;
   const [data, setData] = useState([]);
 
   // Load the data
@@ -41,6 +24,15 @@ function App() {
 
   useEffect(() => {
     function loadChart() {
+      const width = svgWidth - margin.left - margin.right;
+      const height = svgHeight - margin.top - margin.bottom;
+      const svg = d3.select('.svg-container')
+        .append('svg')
+        .attr('width', svgWidth)
+        .attr('height', svgHeight);
+      const group = svg.append('g')
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
       const x = d3.scaleTime().rangeRound([0, width]);
       const y = d3.scaleLinear().rangeRound([height, 0]);
 
@@ -65,14 +57,15 @@ function App() {
     if (data.length) {
       loadChart();
     }
-  }, [data]);
+  }, [data, svgWidth, svgHeight, margin]);
 
   return (
-    <div className="ui container">
+    <Fragment>
+      <Header align="center">{ LINE_CHART_TITLE }</Header>
       <div className="svg-container">
       </div>
-    </div>
+    </Fragment>
   );
 }
 
-export default App;
+export default LineChart;
