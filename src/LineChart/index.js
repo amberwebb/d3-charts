@@ -1,17 +1,18 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import * as d3 from 'd3';
+import useFetch from '../CustomHooks/fetch';
 import { Header } from 'semantic-ui-react';
 import { API_BITCOIN, LINE_CHART_TITLE } from './constants';
 
 function LineChart(props) {
   const { svgWidth, svgHeight, margin } = props;
   const [data, setData] = useState([]);
+  const res = useFetch(API_BITCOIN);
+  const { response, error } = res;
 
-  // Load the data
   useEffect(() => {
-    // TODO - create fetch hook
-    fetch(API_BITCOIN).then((res) => res.json()).then((data) => {
-      const bpi = data.bpi;
+    if (response && !data.length) {
+      const bpi = response.bpi
       const transformedData = Object.keys(bpi).map((key: any) => {
         return {
           date: new Date(key),
@@ -19,8 +20,12 @@ function LineChart(props) {
         }
       });
       setData(transformedData);
-    });
-  }, []);
+    }
+
+    if (error) {
+      console.log(error) // TODO - error handling
+    }
+  }, [response, error, data.length]);
 
   useEffect(() => {
     function loadChart() {
