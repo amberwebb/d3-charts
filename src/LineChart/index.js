@@ -1,8 +1,8 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import * as d3 from 'd3';
 import useFetch from '../CustomHooks/fetch';
-import { Header } from 'semantic-ui-react';
 import { API_BITCOIN, LINE_CHART_TITLE } from './constants';
+import '../styles/index.css';
 
 function LineChart(props) {
   const { svgWidth, svgHeight, margin } = props;
@@ -29,6 +29,9 @@ function LineChart(props) {
 
   useEffect(() => {
     function loadChart() {
+      const tooltip = d3.select('body').append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0);
       const width = svgWidth - margin.left - margin.right;
       const height = svgHeight - margin.top - margin.bottom;
       const svg = d3.select('.svg-container')
@@ -54,9 +57,30 @@ function LineChart(props) {
       group.append("path")
         .datum(data)
         .attr("fill", "none")
-        .attr("stroke", "red")
-        .attr("stroke-width", 1)
+        .attr("stroke", "#38b2ac")
+        .attr("stroke-width", 2)
         .attr("d", line);
+
+      group.selectAll("dot")
+        .data(data)
+        .enter().append("circle")
+        .attr("r", 5)
+        .attr("cx", function(d) { return x(d.date); })
+        .attr("cy", function(d) { return y(d.value); })
+        .attr("fill", "#38b2ac")
+        .on("mouseover", function(d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", 1);
+            tooltip.html(d.value)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
     }
 
     if (data.length) {
@@ -66,7 +90,7 @@ function LineChart(props) {
 
   return (
     <Fragment>
-      <Header align="center">{ LINE_CHART_TITLE }</Header>
+      <h1 className="text-2xl text-center">{ LINE_CHART_TITLE }</h1>
       <div className="svg-container">
       </div>
     </Fragment>
