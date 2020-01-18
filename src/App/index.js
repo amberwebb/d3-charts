@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router } from "react-router-dom";
-import { Container } from 'semantic-ui-react';
 import Routes from './Routes';
-import Nav from '../Components/Nav';
-import './App.css';
+import '../styles/index.css';
 
 function App() {
   const margin = {
@@ -27,14 +25,13 @@ function App() {
 
   return (
     <Router>
-      <Container id="main-container" style={{height: '75vh'}}>
-        <Nav />
+      <div className="container mx-auto m-8" id="main-container" style={{height: '85vh'}}>
         <Routes
           svgWidth={svgWidth}
           svgHeight={svgHeight}
           margin={margin}
         />
-      </Container>
+      </div>
     </Router>
   );
 }
