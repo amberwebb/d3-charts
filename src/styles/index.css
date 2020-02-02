@@ -8346,10 +8346,6 @@ video {
   z-index: auto;
 }
 
-circle {
-  fill: @apply bg-teal-500;
-}
-
 .tooltip {
   position: absolute;
   text-align: center;
