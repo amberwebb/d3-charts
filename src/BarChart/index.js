@@ -1,25 +1,23 @@
 import React, { useEffect, Fragment } from 'react'
 import * as d3 from 'd3'
 import { data } from './data'
+import { BAR_CHART_TITLE } from './constants'
+import { linearScale } from '../chartUtils/scales'
+import { createSvg, createSvgGroup, clearSvg } from '../chartUtils/svg'
+import { createXAxis, createYAxis } from '../chartUtils/axes'
 
 function BarChart(props) {
   const { svgWidth, svgHeight, margin } = props
 
   useEffect(() => {
-    d3.select('.svg-container svg').remove()
+    clearSvg('.svg-container')
     const width = svgWidth - margin.left - margin.right
     const height = svgHeight - margin.top - margin.bottom
-    const svg = d3
-      .select('.svg-container')
-      .append('svg')
-      .attr('width', svgWidth)
-      .attr('height', svgHeight)
-    const group = svg
-      .append('g')
-      .attr('transform', `translate(${margin.left}, ${margin.top})`)
+    const svg = createSvg('.svg-container', svgWidth, svgHeight)
+    const group = createSvgGroup(svg, margin)
 
-    const x = d3.scaleLinear().range([0, width])
-    const y = d3.scaleLinear().range([height, 0])
+    const x = linearScale([0, width])
+    const y = linearScale([height, 0])
 
     const xScaleValue = data.reduce((acc, curr) => {
       return acc + curr.valueX
@@ -31,12 +29,9 @@ function BarChart(props) {
     y.domain([0, d3.max(yScaleValue)])
 
     // X axis
-    group
-      .append('g')
-      .attr('transform', `translate(0, ${height})`)
-      .call(d3.axisBottom(x))
+    createXAxis(group, height, x)
     // Y axis
-    group.append('g').call(d3.axisLeft(y))
+    createYAxis(group, y)
 
     group
       .selectAll('bar')
@@ -62,7 +57,7 @@ function BarChart(props) {
   }, [svgWidth, svgHeight, margin])
   return (
     <Fragment>
-      <h1 className="text-2xl text-center">Chart with Variable Width Bars</h1>
+      <h1 className="text-2xl text-center">{BAR_CHART_TITLE}</h1>
       <div className="svg-container"></div>
     </Fragment>
   )

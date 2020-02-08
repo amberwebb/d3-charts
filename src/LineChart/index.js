@@ -3,6 +3,9 @@ import * as d3 from 'd3'
 import useFetch from '../CustomHooks/fetch'
 import { API_BITCOIN, LINE_CHART_TITLE } from './constants'
 import '../styles/index.css'
+import { linearScale, timeScale } from '../chartUtils/scales'
+import { createSvg, createSvgGroup, clearSvg } from '../chartUtils/svg'
+import { createXAxis, createYAxis } from '../chartUtils/axes'
 
 function LineChart(props) {
   const { svgWidth, svgHeight, margin } = props
@@ -28,7 +31,7 @@ function LineChart(props) {
   }, [response, error, data.length])
 
   useEffect(() => {
-    d3.select('.svg-container svg').remove()
+    clearSvg('.svg-container')
     function loadChart() {
       const tooltip = d3
         .select('body')
@@ -37,17 +40,11 @@ function LineChart(props) {
         .style('opacity', 0)
       const width = svgWidth - margin.left - margin.right
       const height = svgHeight - margin.top - margin.bottom
-      const svg = d3
-        .select('.svg-container')
-        .append('svg')
-        .attr('width', svgWidth)
-        .attr('height', svgHeight)
-      const group = svg
-        .append('g')
-        .attr('transform', `translate(${margin.left}, ${margin.top})`)
+      const svg = createSvg('.svg-container', svgWidth, svgHeight)
+      const group = createSvgGroup(svg, margin)
 
-      const x = d3.scaleTime().rangeRound([0, width])
-      const y = d3.scaleLinear().rangeRound([height, 0])
+      const x = timeScale([0, width])
+      const y = linearScale([height, 0])
 
       const line = d3
         .line()
@@ -58,12 +55,9 @@ function LineChart(props) {
       y.domain(d3.extent(data, d => d.value))
 
       // X axis
-      group
-        .append('g')
-        .attr('transform', `translate(0, ${height})`)
-        .call(d3.axisBottom(x))
+      createXAxis(group, height, x)
       // Y axis
-      group.append('g').call(d3.axisLeft(y))
+      createYAxis(group, y)
       // Line chart
       group
         .append('path')
